@@ -3,7 +3,10 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "opensegy"
+# The distribution is named for the brand; PyPI normalises names per PEP 503,
+# so `pip install opensegy` works all the same and the project page reads
+# OpenSEGY. The import stays lowercase, which is what PEP 8 asks of a module.
+name = "OpenSEGY"
 version = "0.1.0"
 description = "Modern open-source toolkit for SEG-Y"
 readme = "README.md"
