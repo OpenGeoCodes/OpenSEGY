@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opensegy"
+version = "0.1.0"
+description = "Modern open-source toolkit for SEG-Y"
+readme = "README.md"
+# The author line is deliberately name-only. A package page on PyPI is public
+# and indexed; publishing a personal address there is a decision for the person,
+# not a default. Add `email = "..."` if you want one shown.
+authors = [{ name = "Lucas Freitas" }]
+requires-python = ">=3.10"
+# The PEP 639 SPDX form (license = "Apache-2.0" + license-files) needs
+# setuptools>=77 with packaging>=24.2 at build time. The classic form below
+# builds on every toolchain, which matters for a library whose whole pitch is
+# that it installs without ceremony.
+license = { text = "Apache-2.0" }
+keywords = ["segy", "seg-y", "seismic", "geophysics", "subsurface", "file-format"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
+# numpy is the only dependency, and it is not optional: decoding trace samples
+# in pure Python runs at 1 M samples/s against numpy's 47 M, and everyone who
+# opens a SEG-Y already has numpy installed.
+dependencies = ["numpy>=1.23"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.urls]
+# OpenGeoCodes is the umbrella organisation for several geophysics codes, of
+# which this is one. These links are frozen into every published version, so
+# they move only together with the repository itself.
+Homepage = "https://github.com/OpenGeoCodes/OpenSEGY"
+Source = "https://github.com/OpenGeoCodes/OpenSEGY"
+Issues = "https://github.com/OpenGeoCodes/OpenSEGY/issues"
+
+[tool.setuptools.packages.find]
+include = ["opensegy*"]
+
+[tool.setuptools.package-data]
+opensegy = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,6 @@
+# Setuptools puts README and LICENSE in an sdist on its own; everything else a
+# person would want when they unpack the source has to be named here.
+include API.md
+include CHANGELOG.md
+recursive-include examples *.py
+recursive-include tests *.py

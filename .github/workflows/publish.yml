@@ -1,0 +1,57 @@
+name: publish
+
+# Publishing happens on a tag, never on a push to a branch: a version that went
+# out cannot be taken back, so it should take a deliberate act to send one.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+
+      - name: Check the metadata and that the README renders
+        # A README that does not render is the classic way to spoil a first
+        # release, and it cannot be fixed in place afterwards.
+        run: python -m twine check --strict dist/*
+
+      - name: The tag must match the version in pyproject
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          VERSION=$(python -c "import tomllib,pathlib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "tag v$TAG does not match project version $VERSION"; exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      # The whole point of trusted publishing: GitHub mints a short-lived OIDC
+      # token, PyPI exchanges it for a 15-minute upload token, and no long-lived
+      # secret is stored anywhere.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
